@@ -48,7 +48,7 @@ section{margin-top:34px}
 .fld input{border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;font-variant-numeric:tabular-nums;background:var(--card);color:var(--ink)}
 .fld input:focus{outline:2px solid var(--teal)}
 .note{font-size:12px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 18px;margin-top:14px;line-height:1.8}
-.alw-row{display:grid;grid-template-columns:1fr 130px 110px auto;gap:10px;align-items:end;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.alw-row{display:grid;grid-template-columns:500px 1fr 110px auto;gap:10px;align-items:end;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
 .alw-row .fld{margin:0}
 .alw-row label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;display:block}
 .alw-row input,.alw-row select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;background:var(--card);color:var(--ink)}
