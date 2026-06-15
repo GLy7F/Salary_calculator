@@ -153,6 +153,144 @@ function getCurrency(){
   return currentLang==='ar'?'ريال':'SAR';
 }
 
+function updateDynamicContent(){
+  // تحديث كل المحتوى الديناميكي عند تغيير اللغة
+  const basic=v("i_basic");
+  const pGosi=v("i_gosi")/100;
+  const hours=v("i_hours")||7;
+  const daysWk=v("i_days")||5;
+  const otMult=v("i_otMult")||1.5;
+  const eidMult=v("i_eidMult")||2;
+
+  let allow=0, sakanAmount=0;
+  const computed=ALLOWANCES.map(a=>{
+    const amt = a.type==='percent' ? basic*(a.value/100) : a.value;
+    allow+=amt;
+    if(a.sakan)sakanAmount+=amt;
+    return {...a, amt};
+  });
+
+  const gross=basic+allow;
+  const gosi=(basic+sakanAmount)*pGosi;
+  const net=gross-gosi;
+  const allowPct=basic?allow/basic*100:0;
+  const day=gross/30;
+  const hour=hours>0?day/hours:0;
+  const monthlyWorkDays=daysWk*4.33;
+  const cur=getCurrency();
+
+  // تحديث البطاقات الرئيسية مع العملات
+  document.getElementById("net").innerHTML=fmt(net)+'<span class="cur" id="netCur">'+cur+'</span>';
+  document.getElementById("gross").innerHTML=fmt(gross)+'<span class="cur" id="grossCur">'+cur+'</span>';
+  document.getElementById("basicOut").innerHTML=fmt(basic)+'<span class="cur" id="basicCur">'+cur+'</span>';
+  document.getElementById("allowOut").innerHTML=fmt(allow)+'<span class="cur" id="allowCur">'+cur+'</span>';
+  document.getElementById("gosiOut").innerHTML="−"+fmt(gosi)+'<span class="cur" id="gosiCur">'+cur+'</span>';
+
+  // تحديث البدلات
+  document.getElementById("allowList").innerHTML=computed.map(r=>`
+    <div class="row">
+      <div class="ic">${r.icon||'➕'}</div>
+      <div class="nm">${r.name}<small>${r.type==='percent'?r.value+'% '+t('percent-basic'):t('fixed-amount')}</small></div>
+      <div class="pct">${r.type==='percent'?r.value+'%':t('fixed-amount').substring(0,3)}</div>
+      <div class="amt">${fmt(r.amt)}</div>
+    </div>`).join("")+`
+    <div class="row" style="border-top:2px solid var(--teal)">
+      <div class="ic" style="background:var(--teal);color:#fff">Σ</div>
+      <div class="nm">${t('total-allowances-summary')}<small>${t('allowance-pct-note').replace('%s',allowPct.toFixed(2))}</small></div>
+      <div class="pct" style="color:var(--teal);background:var(--teal-soft)">${allowPct.toFixed(1)}%</div>
+      <div class="amt" style="color:var(--teal)">${fmt(allow)}</div>
+    </div>`;
+
+  // تحديث المعدلات
+  document.getElementById("rates").innerHTML=`
+    <div class="rate"><div class="rl">${t('daily-wage')}</div><div class="rv">${fmt(day)}</div><div class="rc">${t('rate-div')}</div></div>
+    <div class="rate"><div class="rl">${t('hourly-wage')}</div><div class="rv">${fmt(hour)}</div><div class="rc">${t('rate-hour').replace('%s',hours)}</div></div>
+    <div class="rate"><div class="rl">${t('overtime-wage')}</div><div class="rv">${fmt(hour*otMult)}</div><div class="rc">${t('rate-ot').replace('%s',otMult)}</div></div>
+    <div class="rate"><div class="rl">${t('holiday-wage')}</div><div class="rv">${fmt(hour*eidMult)}</div><div class="rc">${t('rate-ot').replace('%s',eidMult)}</div></div>
+    <div class="rate"><div class="rl">${t('monthly-workdays')}</div><div class="rv">${monthlyWorkDays.toFixed(1)}</div><div class="rc">${t('rate-days').replace('%s',daysWk)}</div></div>
+    <div class="rate"><div class="rl">${t('monthly-hours')}</div><div class="rv">${(monthlyWorkDays*hours).toFixed(0)}</div><div class="rc">${t('rate-hours').replace('%s',monthlyWorkDays.toFixed(1)).replace('%s',hours)}</div></div>`;
+
+  // تحديث ملاحظة التأمينات
+  const sakanNote = sakanAmount>0 ? t('sakan-basic').replace('%s',fmt(basic+sakanAmount)) : t('no-sakan').replace('%s',fmt(basic));
+  const gosi_pct = v("i_gosi");
+  document.getElementById("gosiNote").innerHTML=t('gosi-calc-note')
+    .replace('%s',gosi_pct)
+    .replace('%s',sakanNote)
+    .replace('%s',fmt(gosi))
+    .replace('%s',fmt(gross))
+    .replace('%s',fmt(gosi))
+    .replace('%s',fmt(net));
+
+  // تحديث الإسقاطات
+  const raiseVal=v("i_raise");
+  const raiseType=document.getElementById("i_raiseType").value;
+  const years=parseInt(document.getElementById("i_years").value)||10;
+
+  if(!basic){
+    document.getElementById("projTable").innerHTML="";
+    document.getElementById("projNote").innerHTML=t('no-basic-input');
+  }else{
+    let curBasic=basic;
+    const rows=[];
+    const base=computeFor(basic,pGosi);
+    for(let y=0;y<=years;y++){
+      const r=computeFor(curBasic,pGosi);
+      rows.push({y, ...r, netDelta:r.net-base.net});
+      curBasic += raiseType==='percent' ? curBasic*(raiseVal/100) : raiseVal;
+    }
+
+    const head=`<thead><tr>
+      <th>${t('table-year')}</th><th>${t('table-basic')}</th><th>${t('table-allowances')}</th><th>${t('table-gross')}</th>
+      <th>${t('table-gosi')}</th><th>${t('table-net')}</th><th>${t('table-delta')}</th></tr></thead>`;
+    const body=`<tbody>`+rows.map(r=>`<tr>
+      <td>${r.y===0?t('now'):t('year')+' '+r.y}</td>
+      <td>${fmt(r.basic)}</td>
+      <td>${fmt(r.allow)}</td>
+      <td>${fmt(r.gross)}</td>
+      <td style="color:var(--rose)">−${fmt(r.gosi)}</td>
+      <td style="font-weight:800;color:var(--teal-d)">${fmt(r.net)}</td>
+      <td>${r.netDelta>0?`<span class="delta">+${fmt(r.netDelta)}</span>`:'—'}</td>
+    </tr>`).join("")+`</tbody>`;
+    document.getElementById("projTable").innerHTML=head+body;
+
+    const last=rows[rows.length-1];
+    const totalGain=last.net-base.net;
+    const totalEarnedExtra=rows.reduce((s,r)=>s+r.netDelta*12,0);
+    if(raiseVal>0){
+      document.getElementById("projNote").innerHTML=t('projection-note')
+        .replace('%s',years)
+        .replace('%s',fmt(base.net))
+        .replace('%s',fmt(last.net))
+        .replace('%s',fmt(totalGain))
+        .replace('%s',fmt(totalEarnedExtra));
+    }else{
+      document.getElementById("projNote").innerHTML=t('no-raise-note');
+    }
+  }
+
+  // التأكد من تحديث جميع العملات
+  if(document.getElementById('netCur'))document.getElementById('netCur').textContent=cur;
+  if(document.getElementById('grossCur'))document.getElementById('grossCur').textContent=cur;
+  if(document.getElementById('basicCur'))document.getElementById('basicCur').textContent=cur;
+  if(document.getElementById('allowCur'))document.getElementById('allowCur').textContent=cur;
+  if(document.getElementById('gosiCur'))document.getElementById('gosiCur').textContent=cur;
+}
+
+function updateAllContent(){
+  updatePageLanguage();
+  renderAllowEditor();
+  const basic=v("i_basic");
+  if(basic){
+    updateDynamicContent();
+  }else{
+    // إذا لم يكن هناك راتب أساسي، حدّث المحتوى الثابت فقط
+    document.getElementById("allowList").innerHTML='';
+    document.getElementById("rates").innerHTML='';
+    document.getElementById("projTable").innerHTML='';
+    document.getElementById("projNote").innerHTML=t('no-basic-input');
+  }
+}
+
 function toggleLanguage(){
   currentLang=currentLang==='ar'?'en':'ar';
   const html=document.documentElement;
@@ -162,12 +300,7 @@ function toggleLanguage(){
   else html.classList.remove('en');
   document.getElementById('langToggle').textContent=currentLang==='ar'?'EN':'العربية';
   localStorage.setItem('lang',currentLang);
-  updatePageLanguage();
-  // أعادة تحديث جميع العناصر الديناميكية
-  setTimeout(()=>{
-    renderAllowEditor();
-    calc();
-  },0);
+  updateAllContent();
 }
 
 function toggleTheme(){
@@ -181,50 +314,50 @@ function updatePageLanguage(){
   document.querySelector('h1').textContent=t('header-title');
   document.querySelector('header p').textContent=t('header-subtitle');
 
+  // تحديث جميع العناصر التي تحتوي على data-i18n
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.getAttribute('data-i18n');
-    if(el.textContent)el.textContent=t(key);
+    if(el)el.textContent=t(key);
   });
 
-  // Update summary cards
+  // تحديث بطاقات الملخص
   const currencyLabel=getCurrency();
-  const netLabel=document.getElementById('netLabel');
-  if(netLabel)netLabel.textContent=t('net-salary');
-  const grossLabel=document.getElementById('grossLabel');
-  if(grossLabel)grossLabel.textContent=t('gross-salary');
-  const basicLabel=document.getElementById('basicLabel');
-  if(basicLabel)basicLabel.textContent=t('basic-salary');
-  const allowLabel=document.getElementById('allowLabel');
-  if(allowLabel)allowLabel.textContent=t('total-allowances');
-  const gosiLabel=document.getElementById('gosiLabel');
-  if(gosiLabel)gosiLabel.textContent=t('gosi-deduction');
+  ['netLabel','grossLabel','basicLabel','allowLabel','gosiLabel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(id==='basicLabel')el.textContent=t('basic-salary');
+    else if(id==='allowLabel')el.textContent=t('total-allowances');
+    else if(id==='gosiLabel')el.textContent=t('gosi-deduction');
+    else if(id==='netLabel')el.textContent=t('net-salary');
+    else if(id==='grossLabel')el.textContent=t('gross-salary');
+  });
 
-  document.getElementById('netCur').textContent=currencyLabel;
-  document.getElementById('grossCur').textContent=currencyLabel;
-  document.getElementById('basicCur').textContent=currencyLabel;
-  document.getElementById('allowCur').textContent=currencyLabel;
-  document.getElementById('gosiCur').textContent=currencyLabel;
+  // تحديث عملات البطاقات
+  if(document.getElementById('netCur'))document.getElementById('netCur').textContent=currencyLabel;
+  if(document.getElementById('grossCur'))document.getElementById('grossCur').textContent=currencyLabel;
+  if(document.getElementById('basicCur'))document.getElementById('basicCur').textContent=currencyLabel;
+  if(document.getElementById('allowCur'))document.getElementById('allowCur').textContent=currencyLabel;
+  if(document.getElementById('gosiCur'))document.getElementById('gosiCur').textContent=currencyLabel;
 
-  const calcNote=document.getElementById('calcNote');
-  if(calcNote)calcNote.innerHTML=t('calc-note');
-  const allowancesDesc=document.getElementById('allowancesDesc');
-  if(allowancesDesc)allowancesDesc.innerHTML=t('allowances-desc');
-  const projDesc=document.getElementById('projDesc');
-  if(projDesc)projDesc.innerHTML=t('projections-desc');
-  const addAllowBtn=document.getElementById('addAllowBtn');
-  if(addAllowBtn)addAllowBtn.textContent=t('add-allowance');
-  const btnFixed=document.getElementById('btn-fixed');
-  if(btnFixed)btnFixed.textContent=t('fixed');
-  const btnPercent=document.getElementById('btn-percent');
-  if(btnPercent)btnPercent.textContent=t('percent');
-  const btn5y=document.getElementById('btn-5y');
-  if(btn5y)btn5y.textContent=t('5-years');
-  const btn7y=document.getElementById('btn-7y');
-  if(btn7y)btn7y.textContent=t('7-years');
-  const btn10y=document.getElementById('btn-10y');
-  if(btn10y)btn10y.textContent=t('10-years');
-  const footer=document.getElementById('footer');
-  if(footer)footer.innerHTML=t('footer-text');
+  // تحديث النصوص الثابتة الأخرى
+  [
+    {id:'calcNote',key:'calc-note',innerHTML:true},
+    {id:'allowancesDesc',key:'allowances-desc',innerHTML:true},
+    {id:'projDesc',key:'projections-desc',innerHTML:true},
+    {id:'addAllowBtn',key:'add-allowance'},
+    {id:'btn-fixed',key:'fixed'},
+    {id:'btn-percent',key:'percent'},
+    {id:'btn-5y',key:'5-years'},
+    {id:'btn-7y',key:'7-years'},
+    {id:'btn-10y',key:'10-years'},
+    {id:'footer',key:'footer-text',innerHTML:true}
+  ].forEach(({id,key,innerHTML})=>{
+    const el=document.getElementById(id);
+    if(el){
+      if(innerHTML)el.innerHTML=t(key);
+      else el.textContent=t(key);
+    }
+  });
 }
 
 function initTheme(){
@@ -325,11 +458,11 @@ function calc(){
   const monthlyWorkDays=daysWk*4.33;
 
   const cur=getCurrency();
-  document.getElementById("net").innerHTML=fmt(net)+'<span class="cur">'+cur+'</span>';
-  document.getElementById("gross").innerHTML=fmt(gross)+'<span class="cur">'+cur+'</span>';
-  document.getElementById("basicOut").innerHTML=fmt(basic)+'<span class="cur">'+cur+'</span>';
-  document.getElementById("allowOut").innerHTML=fmt(allow)+'<span class="cur">'+cur+'</span>';
-  document.getElementById("gosiOut").innerHTML="−"+fmt(gosi)+'<span class="cur">'+cur+'</span>';
+  document.getElementById("net").innerHTML=fmt(net)+'<span class="cur" id="netCur">'+cur+'</span>';
+  document.getElementById("gross").innerHTML=fmt(gross)+'<span class="cur" id="grossCur">'+cur+'</span>';
+  document.getElementById("basicOut").innerHTML=fmt(basic)+'<span class="cur" id="basicCur">'+cur+'</span>';
+  document.getElementById("allowOut").innerHTML=fmt(allow)+'<span class="cur" id="allowCur">'+cur+'</span>';
+  document.getElementById("gosiOut").innerHTML="−"+fmt(gosi)+'<span class="cur" id="gosiCur">'+cur+'</span>';
 
   document.getElementById("allowList").innerHTML=computed.map(r=>`
     <div class="row">
