@@ -1,5 +1,245 @@
+let currentLang="ar";
 const fmt=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 function v(id){const x=parseFloat(document.getElementById(id).value);return isNaN(x)?0:x;}
+
+const i18n={
+  ar:{
+    'header-title':'حاسبة الراتب',
+    'header-subtitle':'مفصّلة وقابلة للتعديل',
+    'net-salary':'صافي الراتب الشهري',
+    'gross-salary':'الراتب الإجمالي',
+    'basic-salary':'💼 الراتب الأساسي',
+    'total-allowances':'➕ إجمالي البدلات',
+    'gosi-deduction':'➖ حسم التأمينات',
+    'allowance-summary':'ملخص البدلات المحتسبة',
+    'rates-section':'معدّلات الأجر',
+    'settings-title':'إعدادات العمل والتأمينات',
+    'basic-inputs':'المدخلات الأساسية',
+    'basic-salary-label':'الراتب الأساسي (ريال)',
+    'gosi-rate':'نسبة التأمينات %',
+    'daily-hours':'ساعات العمل اليومية',
+    'work-days':'أيام العمل في الأسبوع',
+    'ot-multiplier':'معامل أجر الإضافي',
+    'eid-multiplier':'معامل أجر العيد',
+    'calc-note':'💡 <b>أساس الحساب على الأيام الفعلية:</b> أيام العمل الشهرية = أيام الأسبوع × 4.33 أسبوع. أجر اليوم = الإجمالي ÷ 30. أجر الساعة = أجر اليوم ÷ ساعات العمل اليومية.',
+    'allowances-title':'البدلات',
+    'allowances-subtitle':'أضف، عدّل، أو احذف البدلات',
+    'allowances-desc':'كل بدل إما <b>نسبة من الأساسي</b> أو <b>مبلغ ثابت</b>. اضغط «＋ أضف بدلاً» لإنشاء بند جديد.',
+    'allowance-name':'اسم البدل',
+    'allowance-type':'النوع',
+    'percent-basic':'نسبة % من الأساسي',
+    'fixed-amount':'مبلغ ثابت',
+    'add-allowance':'＋ أضف بدلاً',
+    'allowance-summary-title':'ملخص البدلات المحتسبة',
+    'total-allowances-summary':'إجمالي البدلات',
+    'allowance-pct-note':'نسبة البدلات %s% من الأساسي',
+    'gosi-calc-note':'🔎 <b>طريقة الحساب:</b> التأمينات (%s%) تُحسب على %s، أي %s ريال. الصافي = الإجمالي (%s) − التأمينات (%s) = <b>%s ريال</b>.<br>💡 لتحديد أي بدل يدخل في وعاء التأمينات، سمِّه «بدل سكن» (النظام يتعرّف عليه تلقائياً).',
+    'projections-title':'سجل الزيادات السنوية المتوقّعة',
+    'projections-subtitle':'تطوّر راتبك مع العلاوة السنوية',
+    'projections-desc':'يُحسب بافتراض إضافة العلاوة للراتب الأساسي كل سنة، وإعادة احتساب البدلات والتأمينات بناءً عليه.',
+    'annual-raise':'قيمة العلاوة السنوية',
+    'raise-type':'نوع العلاوة',
+    'fixed':'مبلغ ثابت',
+    'percent':'نسبة %',
+    'projection-period':'مدة التوقّع',
+    '5-years':'5 سنوات',
+    '7-years':'7 سنوات',
+    '10-years':'10 سنوات',
+    'now':'الآن',
+    'year':'سنة',
+    'table-year':'السنة',
+    'table-basic':'الأساسي',
+    'table-allowances':'البدلات',
+    'table-gross':'الإجمالي',
+    'table-gosi':'التأمينات',
+    'table-net':'الصافي',
+    'table-delta':'الزيادة التراكمية',
+    'no-basic-input':'أدخل الراتب الأساسي لعرض توقّعات الزيادة.',
+    'projection-note':'📈 بعد <b>%s سنوات</b>: يرتفع صافي راتبك من %s إلى <b>%s ريال</b> (زيادة شهرية %s ريال). إجمالي ما ستكسبه إضافياً عبر الفترة كاملة ≈ <b>%s ريال</b>.',
+    'no-raise-note':'💡 أدخل قيمة العلاوة السنوية أعلاه لرؤية تطوّر راتبك عبر السنوات.',
+    'daily-wage':'📅 أجر اليوم',
+    'hourly-wage':'⏱️ أجر الساعة',
+    'overtime-wage':'➕ أجر الإضافي/ساعة',
+    'holiday-wage':'🎉 أجر العيد/ساعة',
+    'monthly-workdays':'🗓️ أيام العمل/شهر',
+    'monthly-hours':'⏳ ساعات العمل/شهر',
+    'rate-div':'الإجمالي ÷ 30',
+    'rate-hour':'اليوم ÷ %s ساعة',
+    'rate-ot':'الساعة ×%s',
+    'rate-days':'%s يوم × 4.33 أسبوع',
+    'rate-hours':'%s يوم × %s ساعة',
+    'footer-text':'حاسبة راتب · أداة عامة قابلة للتعديل<br>التأمينات تُحسب على (الأساسي + بدل السكن إن وُجد) · البدلات والمعدّلات قابلة للتخصيص بالكامل',
+    'no-allowances':'لا بدلات. اضغط «أضف بدلاً».',
+    'sakan-basic':'الأساسي + بدل السكن = %s ريال',
+    'no-sakan':'الأساسي فقط = %s ريال (لا يوجد بدل سكن محدّد)'
+  },
+  en:{
+    'header-title':'Salary Calculator',
+    'header-subtitle':'Detailed & Customizable',
+    'net-salary':'Monthly Net Salary',
+    'gross-salary':'Gross Salary',
+    'basic-salary':'💼 Basic Salary',
+    'total-allowances':'➕ Total Allowances',
+    'gosi-deduction':'➖ Insurance Deduction',
+    'allowance-summary':'Summary of Calculated Allowances',
+    'rates-section':'Wage Rates',
+    'settings-title':'Work Settings & Insurance',
+    'basic-inputs':'Basic Inputs',
+    'basic-salary-label':'Basic Salary (SAR)',
+    'gosi-rate':'Insurance Rate %',
+    'daily-hours':'Daily Working Hours',
+    'work-days':'Work Days Per Week',
+    'ot-multiplier':'Overtime Rate Multiplier',
+    'eid-multiplier':'Holiday Rate Multiplier',
+    'calc-note':'💡 <b>Calculation Basis on Actual Days:</b> Monthly work days = work days per week × 4.33 weeks. Daily wage = total ÷ 30. Hourly wage = daily wage ÷ daily work hours.',
+    'allowances-title':'Allowances',
+    'allowances-subtitle':'Add, Edit, or Delete Allowances',
+    'allowances-desc':'Each allowance is either a <b>percentage of basic salary</b> or a <b>fixed amount</b>. Click «＋ Add Allowance» to create a new entry.',
+    'allowance-name':'Allowance Name',
+    'allowance-type':'Type',
+    'percent-basic':'% of Basic Salary',
+    'fixed-amount':'Fixed Amount',
+    'add-allowance':'＋ Add Allowance',
+    'allowance-summary-title':'Summary of Calculated Allowances',
+    'total-allowances-summary':'Total Allowances',
+    'allowance-pct-note':'Allowances %s% of basic salary',
+    'gosi-calc-note':'🔎 <b>Calculation Method:</b> Insurance (%s%) is calculated on %s, which is %s SAR. Net = Total (%s) − Insurance (%s) = <b>%s SAR</b>.<br>💡 To specify which allowance is included in the insurance base, name it "Housing Allowance" (the system recognizes it automatically).',
+    'projections-title':'Annual Salary Projections',
+    'projections-subtitle':'Your Salary Growth with Annual Raises',
+    'projections-desc':'Calculated by adding the annual raise to the basic salary each year, and recalculating allowances and insurance accordingly.',
+    'annual-raise':'Annual Raise Amount',
+    'raise-type':'Raise Type',
+    'fixed':'Fixed Amount',
+    'percent':'Percentage %',
+    'projection-period':'Projection Period',
+    '5-years':'5 Years',
+    '7-years':'7 Years',
+    '10-years':'10 Years',
+    'now':'Now',
+    'year':'Year',
+    'table-year':'Year',
+    'table-basic':'Basic',
+    'table-allowances':'Allowances',
+    'table-gross':'Gross',
+    'table-gosi':'Insurance',
+    'table-net':'Net',
+    'table-delta':'Cumulative Increase',
+    'no-basic-input':'Enter the basic salary to view raise projections.',
+    'projection-note':'📈 After <b>%s years</b>: your net salary grows from %s to <b>%s SAR</b> (monthly increase of %s SAR). Total additional earnings over the full period ≈ <b>%s SAR</b>.',
+    'no-raise-note':'💡 Enter an annual raise amount above to see your salary growth over the years.',
+    'daily-wage':'📅 Daily Wage',
+    'hourly-wage':'⏱️ Hourly Wage',
+    'overtime-wage':'➕ Overtime/Hour',
+    'holiday-wage':'🎉 Holiday/Hour',
+    'monthly-workdays':'🗓️ Work Days/Month',
+    'monthly-hours':'⏳ Work Hours/Month',
+    'rate-div':'Total ÷ 30',
+    'rate-hour':'Day ÷ %s hours',
+    'rate-ot':'Hour ×%s',
+    'rate-days':'%s days × 4.33 weeks',
+    'rate-hours':'%s days × %s hours',
+    'footer-text':'Salary Calculator · General Customizable Tool<br>Insurance is calculated on (Basic + Housing Allowance if applicable) · Allowances and rates are fully customizable',
+    'no-allowances':'No allowances. Click «Add Allowance».',
+    'sakan-basic':'Basic + Housing Allowance = %s SAR',
+    'no-sakan':'Basic only = %s SAR (no housing allowance specified)'
+  }
+};
+
+function t(key){
+  return i18n[currentLang][key]||key;
+}
+
+function getCurrency(){
+  return currentLang==='ar'?'ريال':'SAR';
+}
+
+function toggleLanguage(){
+  currentLang=currentLang==='ar'?'en':'ar';
+  const html=document.documentElement;
+  html.lang=currentLang;
+  html.dir=currentLang==='ar'?'rtl':'ltr';
+  if(currentLang==='en')html.classList.add('en');
+  else html.classList.remove('en');
+  document.getElementById('langToggle').textContent=currentLang==='ar'?'EN':'العربية';
+  localStorage.setItem('lang',currentLang);
+  updatePageLanguage();
+  // أعادة تحديث جميع العناصر الديناميكية
+  setTimeout(()=>{
+    renderAllowEditor();
+    calc();
+  },0);
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('dark-mode');
+  const isDark=document.body.classList.contains('dark-mode');
+  document.getElementById('themeToggle').querySelector('.theme-icon').textContent=isDark?'☀️':'🌙';
+  localStorage.setItem('theme',isDark?'dark':'light');
+}
+
+function updatePageLanguage(){
+  document.querySelector('h1').textContent=t('header-title');
+  document.querySelector('header p').textContent=t('header-subtitle');
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(el.textContent)el.textContent=t(key);
+  });
+
+  // Update summary cards
+  const currencyLabel=getCurrency();
+  const netLabel=document.getElementById('netLabel');
+  if(netLabel)netLabel.textContent=t('net-salary');
+  const grossLabel=document.getElementById('grossLabel');
+  if(grossLabel)grossLabel.textContent=t('gross-salary');
+  const basicLabel=document.getElementById('basicLabel');
+  if(basicLabel)basicLabel.textContent=t('basic-salary');
+  const allowLabel=document.getElementById('allowLabel');
+  if(allowLabel)allowLabel.textContent=t('total-allowances');
+  const gosiLabel=document.getElementById('gosiLabel');
+  if(gosiLabel)gosiLabel.textContent=t('gosi-deduction');
+
+  document.getElementById('netCur').textContent=currencyLabel;
+  document.getElementById('grossCur').textContent=currencyLabel;
+  document.getElementById('basicCur').textContent=currencyLabel;
+  document.getElementById('allowCur').textContent=currencyLabel;
+  document.getElementById('gosiCur').textContent=currencyLabel;
+
+  const calcNote=document.getElementById('calcNote');
+  if(calcNote)calcNote.innerHTML=t('calc-note');
+  const allowancesDesc=document.getElementById('allowancesDesc');
+  if(allowancesDesc)allowancesDesc.innerHTML=t('allowances-desc');
+  const projDesc=document.getElementById('projDesc');
+  if(projDesc)projDesc.innerHTML=t('projections-desc');
+  const addAllowBtn=document.getElementById('addAllowBtn');
+  if(addAllowBtn)addAllowBtn.textContent=t('add-allowance');
+  const btnFixed=document.getElementById('btn-fixed');
+  if(btnFixed)btnFixed.textContent=t('fixed');
+  const btnPercent=document.getElementById('btn-percent');
+  if(btnPercent)btnPercent.textContent=t('percent');
+  const btn5y=document.getElementById('btn-5y');
+  if(btn5y)btn5y.textContent=t('5-years');
+  const btn7y=document.getElementById('btn-7y');
+  if(btn7y)btn7y.textContent=t('7-years');
+  const btn10y=document.getElementById('btn-10y');
+  if(btn10y)btn10y.textContent=t('10-years');
+  const footer=document.getElementById('footer');
+  if(footer)footer.innerHTML=t('footer-text');
+}
+
+function initTheme(){
+  const savedTheme=localStorage.getItem('theme')||'light';
+  if(savedTheme==='dark')toggleTheme();
+  const savedLang=localStorage.getItem('lang')||'ar';
+  if(savedLang!=='ar'){
+    currentLang='en';
+    document.documentElement.lang='en';
+    document.documentElement.dir='ltr';
+    document.documentElement.classList.add('en');
+    document.getElementById('langToggle').textContent='العربية';
+    updatePageLanguage();
+  }
+}
 
 /* ====== البدلات الديناميكية ======
    كل بدل: { name, type:"percent"|"fixed", value, icon }
@@ -19,18 +259,18 @@ let ALLOWANCES=[
 function renderAllowEditor(){
   const html=ALLOWANCES.map((a,i)=>`
     <div class="alw-row">
-      <div class="fld"><label>اسم البدل</label>
+      <div class="fld"><label>${t('allowance-name')}</label>
         <input value="${a.name.replace(/"/g,'&quot;')}" oninput="updateAllow(${i},'name',this.value)"></div>
-      <div class="fld"><label>النوع</label>
+      <div class="fld"><label>${t('allowance-type')}</label>
         <select onchange="updateAllow(${i},'type',this.value)">
-          <option value="percent" ${a.type==='percent'?'selected':''}>نسبة % من الأساسي</option>
-          <option value="fixed" ${a.type==='fixed'?'selected':''}>مبلغ ثابت</option>
+          <option value="percent" ${a.type==='percent'?'selected':''}>${t('percent-basic')}</option>
+          <option value="fixed" ${a.type==='fixed'?'selected':''}>${t('fixed-amount')}</option>
         </select></div>
-      <div class="fld"><label>${a.type==='percent'?'النسبة %':'المبلغ'}</label>
+      <div class="fld"><label>${a.type==='percent'?t('allowance-type')+'%':t('fixed-amount')}</label>
         <input type="number" step="${a.type==='percent'?'1':'0.01'}" ${a.type==='percent'?'min="0"':''} value="${a.value}" oninput="updateAllow(${i},'value',this.value)"></div>
-      <button class="alw-del" onclick="removeAllow(${i})" title="حذف">🗑️</button>
+      <button class="alw-del" onclick="removeAllow(${i})" title="${t('allowance-name')}">🗑️</button>
     </div>`).join("");
-  document.getElementById("allowEditor").innerHTML=html||'<p style="font-size:13px;color:var(--muted)">لا بدلات. اضغط «أضف بدلاً».</p>';
+  document.getElementById("allowEditor").innerHTML=html||`<p style="font-size:13px;color:var(--muted)">${t('no-allowances')}</p>`;
 }
 function updateAllow(i,field,val){
   if(field==='value'){
@@ -84,39 +324,44 @@ function calc(){
   const hour=hours>0?day/hours:0;
   const monthlyWorkDays=daysWk*4.33;
 
-  document.getElementById("net").innerHTML=fmt(net)+'<span class="cur">ريال</span>';
-  document.getElementById("gross").innerHTML=fmt(gross)+'<span class="cur">ريال</span>';
-  document.getElementById("basicOut").innerHTML=fmt(basic)+'<span class="cur">ريال</span>';
-  document.getElementById("allowOut").innerHTML=fmt(allow)+'<span class="cur">ريال</span>';
-  document.getElementById("gosiOut").innerHTML="−"+fmt(gosi)+'<span class="cur">ريال</span>';
+  const cur=getCurrency();
+  document.getElementById("net").innerHTML=fmt(net)+'<span class="cur">'+cur+'</span>';
+  document.getElementById("gross").innerHTML=fmt(gross)+'<span class="cur">'+cur+'</span>';
+  document.getElementById("basicOut").innerHTML=fmt(basic)+'<span class="cur">'+cur+'</span>';
+  document.getElementById("allowOut").innerHTML=fmt(allow)+'<span class="cur">'+cur+'</span>';
+  document.getElementById("gosiOut").innerHTML="−"+fmt(gosi)+'<span class="cur">'+cur+'</span>';
 
   document.getElementById("allowList").innerHTML=computed.map(r=>`
     <div class="row">
       <div class="ic">${r.icon||'➕'}</div>
-      <div class="nm">${r.name}<small>${r.type==='percent'?r.value+'% من الأساسي':'مبلغ ثابت'}</small></div>
-      <div class="pct">${r.type==='percent'?r.value+'%':'ثابت'}</div>
+      <div class="nm">${r.name}<small>${r.type==='percent'?r.value+'% '+t('percent-basic'):t('fixed-amount')}</small></div>
+      <div class="pct">${r.type==='percent'?r.value+'%':t('fixed-amount').substring(0,3)}</div>
       <div class="amt">${fmt(r.amt)}</div>
     </div>`).join("")+`
     <div class="row" style="border-top:2px solid var(--teal)">
       <div class="ic" style="background:var(--teal);color:#fff">Σ</div>
-      <div class="nm">إجمالي البدلات<small>نسبة البدلات ${allowPct.toFixed(2)}% من الأساسي</small></div>
+      <div class="nm">${t('total-allowances-summary')}<small>${t('allowance-pct-note').replace('%s',allowPct.toFixed(2))}</small></div>
       <div class="pct" style="color:var(--teal);background:var(--teal-soft)">${allowPct.toFixed(1)}%</div>
       <div class="amt" style="color:var(--teal)">${fmt(allow)}</div>
     </div>`;
 
   document.getElementById("rates").innerHTML=`
-    <div class="rate"><div class="rl">📅 أجر اليوم</div><div class="rv">${fmt(day)}</div><div class="rc">الإجمالي ÷ 30</div></div>
-    <div class="rate"><div class="rl">⏱️ أجر الساعة</div><div class="rv">${fmt(hour)}</div><div class="rc">اليوم ÷ ${hours} ساعة</div></div>
-    <div class="rate"><div class="rl">➕ أجر الإضافي/ساعة</div><div class="rv">${fmt(hour*otMult)}</div><div class="rc">الساعة ×${otMult}</div></div>
-    <div class="rate"><div class="rl">🎉 أجر العيد/ساعة</div><div class="rv">${fmt(hour*eidMult)}</div><div class="rc">الساعة ×${eidMult}</div></div>
-    <div class="rate"><div class="rl">🗓️ أيام العمل/شهر</div><div class="rv">${monthlyWorkDays.toFixed(1)}</div><div class="rc">${daysWk} يوم × 4.33 أسبوع</div></div>
-    <div class="rate"><div class="rl">⏳ ساعات العمل/شهر</div><div class="rv">${(monthlyWorkDays*hours).toFixed(0)}</div><div class="rc">${monthlyWorkDays.toFixed(1)} يوم × ${hours} ساعة</div></div>`;
+    <div class="rate"><div class="rl">${t('daily-wage')}</div><div class="rv">${fmt(day)}</div><div class="rc">${t('rate-div')}</div></div>
+    <div class="rate"><div class="rl">${t('hourly-wage')}</div><div class="rv">${fmt(hour)}</div><div class="rc">${t('rate-hour').replace('%s',hours)}</div></div>
+    <div class="rate"><div class="rl">${t('overtime-wage')}</div><div class="rv">${fmt(hour*otMult)}</div><div class="rc">${t('rate-ot').replace('%s',otMult)}</div></div>
+    <div class="rate"><div class="rl">${t('holiday-wage')}</div><div class="rv">${fmt(hour*eidMult)}</div><div class="rc">${t('rate-ot').replace('%s',eidMult)}</div></div>
+    <div class="rate"><div class="rl">${t('monthly-workdays')}</div><div class="rv">${monthlyWorkDays.toFixed(1)}</div><div class="rc">${t('rate-days').replace('%s',daysWk)}</div></div>
+    <div class="rate"><div class="rl">${t('monthly-hours')}</div><div class="rv">${(monthlyWorkDays*hours).toFixed(0)}</div><div class="rc">${t('rate-hours').replace('%s',monthlyWorkDays.toFixed(1)).replace('%s',hours)}</div></div>`;
 
-  const sakanNote = sakanAmount>0 ? `الأساسي + بدل السكن = ${fmt(basic+sakanAmount)} ريال` : `الأساسي فقط = ${fmt(basic)} ريال (لا يوجد بدل سكن محدّد)`;
-  document.getElementById("gosiNote").innerHTML=
-    `🔎 <b>طريقة الحساب:</b> التأمينات (${v("i_gosi")}%) تُحسب على ${sakanNote}، أي ${fmt(gosi)} ريال. `+
-    `الصافي = الإجمالي (${fmt(gross)}) − التأمينات (${fmt(gosi)}) = <b>${fmt(net)} ريال</b>.`+
-    `<br>💡 لتحديد أي بدل يدخل في وعاء التأمينات، سمِّه «بدل سكن» (النظام يتعرّف عليه تلقائياً).`;
+  const sakanNote = sakanAmount>0 ? t('sakan-basic').replace('%s',fmt(basic+sakanAmount)) : t('no-sakan').replace('%s',fmt(basic));
+  const gosi_pct = v("i_gosi");
+  document.getElementById("gosiNote").innerHTML=t('gosi-calc-note')
+    .replace('%s',gosi_pct)
+    .replace('%s',sakanNote)
+    .replace('%s',fmt(gosi))
+    .replace('%s',fmt(gross))
+    .replace('%s',fmt(gosi))
+    .replace('%s',fmt(net));
 
   renderProjection(basic, pGosi);
 }
@@ -128,7 +373,7 @@ function renderProjection(basic, pGosi){
 
   if(!basic){
     document.getElementById("projTable").innerHTML="";
-    document.getElementById("projNote").innerHTML="أدخل الراتب الأساسي لعرض توقّعات الزيادة.";
+    document.getElementById("projNote").innerHTML=t('no-basic-input');
     return;
   }
 
@@ -142,10 +387,10 @@ function renderProjection(basic, pGosi){
   }
 
   const head=`<thead><tr>
-    <th>السنة</th><th>الأساسي</th><th>البدلات</th><th>الإجمالي</th>
-    <th>التأمينات</th><th>الصافي</th><th>الزيادة التراكمية</th></tr></thead>`;
+    <th>${t('table-year')}</th><th>${t('table-basic')}</th><th>${t('table-allowances')}</th><th>${t('table-gross')}</th>
+    <th>${t('table-gosi')}</th><th>${t('table-net')}</th><th>${t('table-delta')}</th></tr></thead>`;
   const body=`<tbody>`+rows.map(r=>`<tr>
-    <td>${r.y===0?'الآن':'سنة '+r.y}</td>
+    <td>${r.y===0?t('now'):t('year')+' '+r.y}</td>
     <td>${fmt(r.basic)}</td>
     <td>${fmt(r.allow)}</td>
     <td>${fmt(r.gross)}</td>
@@ -159,12 +404,14 @@ function renderProjection(basic, pGosi){
   const totalGain=last.net-base.net;
   const totalEarnedExtra=rows.reduce((s,r)=>s+r.netDelta*12,0);
   if(raiseVal>0){
-    document.getElementById("projNote").innerHTML=
-      `📈 بعد <b>${years} سنوات</b>: يرتفع صافي راتبك من ${fmt(base.net)} إلى <b>${fmt(last.net)} ريال</b> `+
-      `(زيادة شهرية ${fmt(totalGain)} ريال). `+
-      `إجمالي ما ستكسبه إضافياً عبر الفترة كاملة ≈ <b>${fmt(totalEarnedExtra)} ريال</b>.`;
+    document.getElementById("projNote").innerHTML=t('projection-note')
+      .replace('%s',years)
+      .replace('%s',fmt(base.net))
+      .replace('%s',fmt(last.net))
+      .replace('%s',fmt(totalGain))
+      .replace('%s',fmt(totalEarnedExtra));
   }else{
-    document.getElementById("projNote").innerHTML="💡 أدخل قيمة العلاوة السنوية أعلاه لرؤية تطوّر راتبك عبر السنوات.";
+    document.getElementById("projNote").innerHTML=t('no-raise-note');
   }
 }
 
@@ -205,6 +452,7 @@ INPUT_IDS.forEach(id=>{const el=document.getElementById(id);if(el)el.addEventLis
 const _calc=calc;
 calc=function(){_calc();saveState();};
 
+initTheme();
 loadState();
 renderAllowEditor();
 calc();

@@ -12,6 +12,14 @@
     <div class="head-in">
       <div class="mark">💵</div>
       <div><h1>حاسبة الراتب</h1><p>مفصّلة وقابلة للتعديل</p></div>
+      <div class="header-controls">
+        <button class="control-btn" id="langToggle" onclick="toggleLanguage()" title="Toggle Language">
+          <span class="lang-text">EN</span>
+        </button>
+        <button class="control-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -19,78 +27,78 @@
 <div class="wrap">
   <div class="summary">
     <div class="scard hero">
-      <div><div class="lab">صافي الراتب الشهري</div><div class="val" id="net">0<span class="cur">ريال</span></div></div>
-      <div style="text-align:left"><div class="lab">الراتب الإجمالي</div><div class="val" id="gross" style="font-size:26px">0<span class="cur">ريال</span></div></div>
+      <div><div class="lab" id="netLabel">صافي الراتب الشهري</div><div class="val" id="net">0<span class="cur" id="netCur">ريال</span></div></div>
+      <div style="text-align:left"><div class="lab" id="grossLabel">الراتب الإجمالي</div><div class="val" id="gross" style="font-size:26px">0<span class="cur" id="grossCur">ريال</span></div></div>
     </div>
-    <div class="scard"><div class="lab">💼 الراتب الأساسي</div><div class="val" id="basicOut">0<span class="cur">ريال</span></div></div>
-    <div class="scard"><div class="lab">➕ إجمالي البدلات</div><div class="val" id="allowOut">0<span class="cur">ريال</span></div></div>
-    <div class="scard"><div class="lab">➖ حسم التأمينات</div><div class="val" id="gosiOut" style="color:var(--rose)">0<span class="cur">ريال</span></div></div>
+    <div class="scard"><div class="lab" id="basicLabel">💼 الراتب الأساسي</div><div class="val" id="basicOut">0<span class="cur" id="basicCur">ريال</span></div></div>
+    <div class="scard"><div class="lab" id="allowLabel">➕ إجمالي البدلات</div><div class="val" id="allowOut">0<span class="cur" id="allowCur">ريال</span></div></div>
+    <div class="scard"><div class="lab" id="gosiLabel">➖ حسم التأمينات</div><div class="val" id="gosiOut" style="color:var(--rose)">0<span class="cur" id="gosiCur">ريال</span></div></div>
   </div>
 
   <section>
-    <div class="sh"><span class="n">01</span><h2>معدّلات الأجر</h2></div>
+    <div class="sh"><span class="n">01</span><h2 data-i18n="rates-section">معدّلات الأجر</h2></div>
     <div class="rates" id="rates"></div>
   </section>
 
   <section>
-    <div class="sh"><span class="n">03</span><h2>الإعدادات الأساسية</h2></div>
+    <div class="sh"><span class="n">02</span><h2 data-i18n="settings-title">إعدادات العمل والتأمينات</h2></div>
     <div class="inp">
-      <h3>المدخلات الأساسية</h3>
+      <h3 data-i18n="basic-inputs">المدخلات الأساسية</h3>
       <div class="ig">
-        <div class="fld"><label>الراتب الأساسي (ريال)</label><input id="i_basic" type="number" step="0.01" value="" placeholder="0" oninput="calc()"></div>
-        <div class="fld"><label>نسبة التأمينات %</label><input id="i_gosi" type="number" step="0.01" value="9.75" oninput="calc()"></div>
-        <div class="fld"><label>ساعات العمل اليومية</label><input id="i_hours" type="number" step="0.5" value="7" oninput="calc()"></div>
-        <div class="fld"><label>أيام العمل في الأسبوع</label><input id="i_days" type="number" step="1" value="5" oninput="calc()"></div>
-        <div class="fld"><label>معامل أجر الإضافي</label><input id="i_otMult" type="number" step="0.01" value="1.5" oninput="calc()"></div>
-        <div class="fld"><label>معامل أجر العيد</label><input id="i_eidMult" type="number" step="0.01" value="2" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="basic-salary-label">الراتب الأساسي (ريال)</label><input id="i_basic" type="number" step="0.01" value="" placeholder="0" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="gosi-rate">نسبة التأمينات %</label><input id="i_gosi" type="number" step="0.01" value="9.75" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="daily-hours">ساعات العمل اليومية</label><input id="i_hours" type="number" step="0.5" value="7" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="work-days">أيام العمل في الأسبوع</label><input id="i_days" type="number" step="1" value="5" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="ot-multiplier">معامل أجر الإضافي</label><input id="i_otMult" type="number" step="0.01" value="1.5" oninput="calc()"></div>
+        <div class="fld"><label data-i18n="eid-multiplier">معامل أجر العيد</label><input id="i_eidMult" type="number" step="0.01" value="2" oninput="calc()"></div>
       </div>
-      <div class="note" style="margin-top:14px">
+      <div class="note" style="margin-top:14px" id="calcNote">
         💡 <b>أساس الحساب على الأيام الفعلية:</b> أيام العمل الشهرية = أيام الأسبوع × 4.33 أسبوع. أجر اليوم = الإجمالي ÷ 30. أجر الساعة = أجر اليوم ÷ ساعات العمل اليومية.
       </div>
     </div>
   </section>
 
   <section>
-    <div class="sh"><span class="n">02</span><h2>البدلات</h2></div>
+    <div class="sh"><span class="n">03</span><h2 data-i18n="allowances-title">البدلات</h2></div>
     <div class="inp">
-      <h3>أضف، عدّل، أو احذف البدلات</h3>
-      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">كل بدل إما <b>نسبة من الأساسي</b> أو <b>مبلغ ثابت</b>. اضغط «＋ أضف بدلاً» لإنشاء بند جديد.</p>
+      <h3 data-i18n="allowances-subtitle">أضف، عدّل، أو احذف البدلات</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px" id="allowancesDesc">كل بدل إما <b>نسبة من الأساسي</b> أو <b>مبلغ ثابت</b>. اضغط «＋ أضف بدلاً» لإنشاء بند جديد.</p>
       <div id="allowEditor"></div>
-      <button class="addbtn" onclick="addAllowance()">＋ أضف بدلاً</button>
+      <button class="addbtn" onclick="addAllowance()" id="addAllowBtn">＋ أضف بدلاً</button>
       <div class="note" id="gosiNote" style="margin-top:16px"></div>
     </div>
   </section>
 
   <section>
-    <div class="sh"><span class="n">03</span><h2>ملخص البدلات المحتسبة</h2></div>
+    <div class="sh"><span class="n">04</span><h2 data-i18n="allowance-summary">ملخص البدلات المحتسبة</h2></div>
     <div class="panel" id="allowList"></div>
   </section>
 
   <section>
-    <div class="sh"><span class="n">04</span><h2>سجل الزيادات السنوية المتوقّعة</h2></div>
+    <div class="sh"><span class="n">05</span><h2 data-i18n="projections-title">سجل الزيادات السنوية المتوقّعة</h2></div>
     <div class="inp">
-      <h3>تطوّر راتبك مع العلاوة السنوية</h3>
-      <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px">يُحسب بافتراض إضافة العلاوة للراتب الأساسي كل سنة، وإعادة احتساب البدلات والتأمينات بناءً عليه.</p>
+      <h3 data-i18n="projections-subtitle">تطوّر راتبك مع العلاوة السنوية</h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px" id="projDesc">يُحسب بافتراض إضافة العلاوة للراتب الأساسي كل سنة، وإعادة احتساب البدلات والتأمينات بناءً عليه.</p>
 
       <div class="raise-bar">
         <div class="raise-fld">
-          <label>قيمة العلاوة السنوية</label>
+          <label data-i18n="annual-raise">قيمة العلاوة السنوية</label>
           <input id="i_raise" type="number" step="0.01" value="0" placeholder="0" oninput="calc()">
         </div>
         <div class="raise-fld">
-          <label>نوع العلاوة</label>
+          <label data-i18n="raise-type">نوع العلاوة</label>
           <div class="seg" id="seg_raiseType">
-            <button type="button" class="seg-btn active" data-val="fixed" onclick="setRaiseType('fixed')">مبلغ ثابت</button>
-            <button type="button" class="seg-btn" data-val="percent" onclick="setRaiseType('percent')">نسبة %</button>
+            <button type="button" class="seg-btn active" data-val="fixed" onclick="setRaiseType('fixed')" id="btn-fixed">مبلغ ثابت</button>
+            <button type="button" class="seg-btn" data-val="percent" onclick="setRaiseType('percent')" id="btn-percent">نسبة %</button>
           </div>
           <input type="hidden" id="i_raiseType" value="fixed">
         </div>
         <div class="raise-fld">
-          <label>مدة التوقّع</label>
+          <label data-i18n="projection-period">مدة التوقّع</label>
           <div class="seg" id="seg_years">
-            <button type="button" class="seg-btn" data-val="5" onclick="setYears(5)">5 سنوات</button>
-            <button type="button" class="seg-btn" data-val="7" onclick="setYears(7)">7 سنوات</button>
-            <button type="button" class="seg-btn active" data-val="10" onclick="setYears(10)">10 سنوات</button>
+            <button type="button" class="seg-btn" data-val="5" onclick="setYears(5)" id="btn-5y">5 سنوات</button>
+            <button type="button" class="seg-btn" data-val="7" onclick="setYears(7)" id="btn-7y">7 سنوات</button>
+            <button type="button" class="seg-btn active" data-val="10" onclick="setYears(10)" id="btn-10y">10 سنوات</button>
           </div>
           <input type="hidden" id="i_years" value="10">
         </div>
@@ -101,7 +109,7 @@
     </div>
   </section>
 
-  <footer>
+  <footer id="footer">
     حاسبة راتب · أداة عامة قابلة للتعديل<br>
     التأمينات تُحسب على (الأساسي + بدل السكن إن وُجد) · البدلات والمعدّلات قابلة للتخصيص بالكامل
   </footer>
