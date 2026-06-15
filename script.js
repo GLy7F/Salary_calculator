@@ -13,7 +13,7 @@ let ALLOWANCES=[
   {name:"بدل طبيعة عمل", type:"percent", value:15, icon:"⚙️"},
   {name:"بدل تأهيل",     type:"percent", value:5,  icon:"🎓"},
   {name:"بدل تميز",      type:"percent", value:0,  icon:"⭐"},
-  {name:"بدل إعاشة",     type:"fixed",   value:0,  icon:"🍽️"},
+  {name:"بدل إعاشة",     type:"fixed",   value:1000,  icon:"🍽️"},
 ];
 
 function renderAllowEditor(){
@@ -62,7 +62,7 @@ function computeFor(basic, pGosi){
 function calc(){
   const basic=v("i_basic");
   const pGosi=v("i_gosi")/100;
-  const hours=v("i_hours")||8;
+  const hours=v("i_hours")||7;
   const daysWk=v("i_days")||5;
   const otMult=v("i_otMult")||1.5;
   const eidMult=v("i_eidMult")||2;
