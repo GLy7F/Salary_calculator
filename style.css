@@ -63,6 +63,10 @@ section{margin-top:34px}
 .alw-row label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px;display:block}
 .alw-row input,.alw-row select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;background:var(--card);color:var(--ink)}
 .alw-row input:focus,.alw-row select:focus{outline:2px solid var(--teal)}
+.alw-row input[type="number"]{padding-right:8px}
+.alw-row input[type="number"]::-webkit-outer-spin-button,.alw-row input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:inner-spin-button;opacity:1;height:32px;cursor:pointer}
+.alw-row input[type="number"]::-webkit-outer-spin-button{margin-right:-4px}
+.alw-row input[type="number"]::-webkit-inner-spin-button{margin-right:-4px}
 .alw-del{background:var(--rose-soft);color:var(--rose);border:none;border-radius:9px;padding:9px 13px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;height:38px}
 .alw-del:hover{background:#f5d6d3}
 .addbtn{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:13.5px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:6px}

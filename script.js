@@ -400,17 +400,29 @@ function renderAllowEditor(){
           <option value="fixed" ${a.type==='fixed'?'selected':''}>${t('fixed-amount')}</option>
         </select></div>
       <div class="fld"><label>${a.type==='percent'?t('allowance-type')+'%':t('fixed-amount')}</label>
-        <input type="number" step="${a.type==='percent'?'1':'0.01'}" ${a.type==='percent'?'min="0"':''} value="${a.value}" oninput="updateAllow(${i},'value',this.value)"></div>
+        <input type="number" step="0.01" min="0" value="${a.value}" oninput="updateAllow(${i},'value',this.value)" title="${a.type==='percent'?'استخدم الأسهم لتعديل دقيق (0.01) أو اكتب القيمة مباشرة':''}"></div>
       <button class="alw-del" onclick="removeAllow(${i})" title="${t('allowance-name')}">🗑️</button>
     </div>`).join("");
   document.getElementById("allowEditor").innerHTML=html||`<p style="font-size:13px;color:var(--muted)">${t('no-allowances')}</p>`;
 }
 function updateAllow(i,field,val){
   if(field==='value'){
-    val = ALLOWANCES[i].type==='percent' ? Math.round(parseFloat(val)||0) : parseFloat(val)||0;
+    // قبول الكسور العشرية للنسب المئوية (مثل 4.33%)
+    val = parseFloat(val)||0;
+    // تحديد عدد الكسور العشرية الأقصى (4 كسور عشرية)
+    if(ALLOWANCES[i].type==='percent'){
+      val = Math.round(val*10000)/10000;
+    }
   }
   ALLOWANCES[i][field]=val;
-  if(field==='type'&&val==='percent') ALLOWANCES[i].value=Math.round(ALLOWANCES[i].value);
+  if(field==='type'&&val==='percent'){
+    // عند التحويل إلى نسبة مئوية، قبول الكسور العشرية
+    ALLOWANCES[i].value = ALLOWANCES[i].value;
+  }
+  if(field==='type'&&val==='fixed'){
+    // عند التحويل إلى مبلغ ثابت
+    ALLOWANCES[i].value = ALLOWANCES[i].value;
+  }
   ALLOWANCES.forEach(a=>{ a.sakan = /سكن/.test(a.name); });
   if(field==='type'||field==='name')renderAllowEditor();
   calc();
