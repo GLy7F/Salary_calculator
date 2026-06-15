@@ -17,6 +17,7 @@
 
 ```
 https://gly7f.github.io/Salary_calculator/
+
 ```
 
 
@@ -54,32 +55,6 @@ start index.html       # Windows
 python3 -m http.server 8000
 # افتح http://localhost:8000
 ```
-
----
-
-## 🌐 النشر على GitHub Pages
-
-1. ارفع المشروع إلى مستودع على GitHub:
-   ```bash
-   git init
-   git add .
-   git commit -m "حاسبة الراتب"
-   git branch -M main
-   git remote add origin https://github.com/<USERNAME>/<REPO-NAME>.git
-   git push -u origin main
-   ```
-
-2. في صفحة المستودع على GitHub:
-   - اذهب إلى **Settings** ← **Pages**
-   - تحت **Source** اختر الفرع **main** والمجلد **/ (root)**
-   - اضغط **Save**
-
-3. بعد دقيقة، سيكون موقعك متاحاً على:
-   ```
-   https://<USERNAME>.github.io/<REPO-NAME>/
-   ```
-
-> لأن `index.html` في جذر المستودع، سيُعرض مباشرة دون أي إعداد إضافي.
 
 ---
 
