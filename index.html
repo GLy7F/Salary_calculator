@@ -226,14 +226,17 @@ function renderAllowEditor(){
           <option value="fixed" ${a.type==='fixed'?'selected':''}>مبلغ ثابت</option>
         </select></div>
       <div class="fld"><label>${a.type==='percent'?'النسبة %':'المبلغ'}</label>
-        <input type="number" step="0.01" value="${a.value}" oninput="updateAllow(${i},'value',this.value)"></div>
+        <input type="number" step="${a.type==='percent'?'1':'0.01'}" ${a.type==='percent'?'min="0"':''} value="${a.value}" oninput="updateAllow(${i},'value',this.value)"></div>
       <button class="alw-del" onclick="removeAllow(${i})" title="حذف">🗑️</button>
     </div>`).join("");
   document.getElementById("allowEditor").innerHTML=html||'<p style="font-size:13px;color:var(--muted)">لا بدلات. اضغط «أضف بدلاً».</p>';
 }
 function updateAllow(i,field,val){
-  if(field==='value')val=parseFloat(val)||0;
+  if(field==='value'){
+    val = ALLOWANCES[i].type==='percent' ? Math.round(parseFloat(val)||0) : parseFloat(val)||0;
+  }
   ALLOWANCES[i][field]=val;
+  if(field==='type'&&val==='percent') ALLOWANCES[i].value=Math.round(ALLOWANCES[i].value);
   ALLOWANCES.forEach(a=>{ a.sakan = /سكن/.test(a.name); });  // تحديد بدل السكن تلقائياً
   if(field==='type'||field==='name')renderAllowEditor();
   calc();
