@@ -13,13 +13,13 @@
 
 ## 🔗 العرض المباشر
 
-بعد تفعيل GitHub Pages (انظر الأسفل)، سيكون الموقع على:
+
 
 ```
-https://<USERNAME>.github.io/<REPO-NAME>/
+https://gly7f.github.io/Salary_calculator/
 ```
 
-> استبدل `<USERNAME>` باسم حسابك و`<REPO-NAME>` باسم المستودع.
+
 
 ---
 
