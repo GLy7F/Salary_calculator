@@ -1,9 +1,18 @@
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Editors
 .vscode/
 .idea/
 *.swp
+*~
+
+# Node (للاختبار فقط)
 node_modules/
 package-lock.json
+
+# مؤقتات
 *.tmp
 *.log
