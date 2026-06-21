@@ -16,7 +16,7 @@
 
 
 ```
-![رابط المشروع](https://gly7f.github.io/Salary_calculator/)
+![رابط المشروع](https://gly7f.github.io/Salary_calculator)
 
 ```
 
